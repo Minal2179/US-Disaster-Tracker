@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
 		var mod_results = [];
 		for (var i = 0; i < results.length; i++) {
 			if(results[i].incidentType == "Tornado" && results[i].state=="IN"){
-				MapData.initMap().addMarker({coords:{lat:40.2672, lng:-86.1349},icon:'https://www.flaticon.com/free-icon/tornado_189177#term=tornado&page=1&position=17', content:'<h1>Tornado data</h1>'})
+				//MapData.initMap().addMarker({coords:{lat:40.2672, lng:-86.1349},icon:'https://www.flaticon.com/free-icon/tornado_189177#term=tornado&page=1&position=17', content:'<h1>Tornado data</h1>'})
 				mod_results.push(results[i]);
 			}
 		}

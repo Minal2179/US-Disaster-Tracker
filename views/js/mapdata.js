@@ -1,4 +1,4 @@
- exports.initMap = function(){
+var initMap = function(){
     //Map options added
     var options ={
       zoom:8,
