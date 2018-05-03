@@ -2,7 +2,7 @@
   "name": "checkr",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,10 @@
   "dependencies": {
     "ejs": "^2.5.9",
     "express": "^4.16.3",
-    "mongoose": "^5.0.17"
+    "mongoose": "^5.0.17",
+    "morgan" : "~1.2.2",
+    "body-parser": "~1.5.2",
+    "jsonwebtoken": "^5.0.2",
+    "method-override": "~2.1.2"
   }
 }
