@@ -30,59 +30,61 @@ angular.module('mapdata', []).factory('mapdata', function($http){
     };
 
     var convertToMapPoints = function(response){
-      var locations = [];
-      console.log(response);
-      var statefilter = null;
-      var disasterfilter = null;
-      var incidentBeginDatefilter = null;
-      var incidentEndDatefilter = null;
-      var query='';
-      if(response.state){
-        statefilter = "state eq '"+response.state+"'";
-      }
-      if(response.disaster_type){
-        if(statefilter)
-            disasterfilter = "and incidentType eq '"+response.disaster_type+"'";
-        else
-            disasterfilter = "incidentType eq '"+response.disaster_type+"'";
-      }
-      if(response.date_from){
-        if(statefilter || disasterfilter)
-            incidentBeginDatefilter = "and incidentBeginDate ge '"+response.date_from+"'";
-        else
-            incidentBeginDatefilter = "incidentBeginDate ge '"+response.date_from+"'";
-      }
-      if(response.date_to){
-        if(statefilter || disasterfilter || incidentBeginDatefilter)
-            incidentEndDatefilter = "and incidentEndDate le '"+response.date_to+"'";
-        else
-            incidentEndDatefilter = "incidentEndDate le '"+response.date_to+"'";
-      }
-      if(statefilter!=null){
-        query = query+statefilter;
-      }
-      if(disasterfilter!=null){
-        query = query+disasterfilter;
-      }
-      if(incidentEndDatefilter!=null){
-        query = query+incidentEndDatefilter;
-      }
-      if(incidentBeginDatefilter!=null){
-        query = query+incidentBeginDatefilter;
-      }
+        var locations = [];
+        console.log(response);
+        console.log("Step 1");
+        var statefilter = null;
+        var disasterfilter = null;
+        var incidentBeginDatefilter = null;
+        var incidentEndDatefilter = null;
+        var query='';
+        if(response.state){
+            statefilter = "state eq '"+response.state+"'";
+        }
+        if(response.disaster_type){
+            if(statefilter)
+                disasterfilter = "and incidentType eq '"+response.disaster_type+"'";
+            else
+                disasterfilter = "incidentType eq '"+response.disaster_type+"'";
+        }
+        if(response.date_from){
+            if(statefilter || disasterfilter)
+                incidentBeginDatefilter = "and incidentBeginDate ge '"+response.date_from+"'";
+            else
+                incidentBeginDatefilter = "incidentBeginDate ge '"+response.date_from+"'";
+        }
+        if(response.date_to){
+            if(statefilter || disasterfilter || incidentBeginDatefilter)
+                incidentEndDatefilter = "and incidentEndDate le '"+response.date_to+"'";
+            else
+                incidentEndDatefilter = "incidentEndDate le '"+response.date_to+"'";
+        }
+        if(statefilter!=null){
+            query = query+statefilter;
+        }
+        if(disasterfilter!=null){
+            query = query+disasterfilter;
+        }
+        if(incidentEndDatefilter!=null){
+            query = query+incidentEndDatefilter;
+        }
+        if(incidentBeginDatefilter!=null){
+            query = query+incidentBeginDatefilter;
+        }
 
-
-      $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?$filter='+query)
-      .success(function(results){
-        var disasterSummary = results.DisasterDeclarationsSummaries;
-        console.log("I am here somehow");
-        for(var i= 0; i < disasterSummary.length; i++) {
+        //get Filtered FEMA data via api
+        $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?$filter='+query)
+        .success(function(results) {
+            console.log("Step 2");
+            var disasterSummary = results.DisasterDeclarationsSummaries;
+            console.log("I am here somehow");
+            for(var i= 0; i < disasterSummary.length; i++) {
                 var disasterreport = disasterSummary[i];
-                console.log(disasterreport);
+                // console.log(disasterreport);
                 var county;
                 if(disasterreport.declaredCountyArea){
                     county = disasterreport.declaredCountyArea.split(' (County)');
-                    console.log(county[0]);
+                    // console.log(county[0]);
                 }
                 if(county)
                     address = county[0];
@@ -90,11 +92,16 @@ angular.module('mapdata', []).factory('mapdata', function($http){
                     address = disasterreport.state;
 
                 var lat,lng;
-                $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyCVonx72WOIIz2UW_L8Unp4P7E5Ob2bryk').success(function(latlng){
+                    
+                //Get coordinates for each of the location
+                $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyCVonx72WOIIz2UW_L8Unp4P7E5Ob2bryk')
+                .success(function(latlng){
+                    console.log("Step 3");
                     lat = latlng.results[0].geometry.location.lat;
                     lng = latlng.results[0].geometry.location.lng;
 
-                    console.log("latlng"+lat+" "+lng);
+                    // console.log("latlng"+lat+" "+lng);
+
                     // Create popup windows for each record
                     var  contentString =
                         '<p><b>State</b>: ' + disasterreport.state +
@@ -105,33 +112,39 @@ angular.module('mapdata', []).factory('mapdata', function($http){
                         '<br><b>Date To</b>: ' + disasterreport.incidentEndDate +
                         '</p>';
 
-                    // Converts each of the JSON records into Google Maps Location format (Note [Lat, Lng] format).
-                    locations.push({
-                        latlon: new google.maps.LatLng(lat, lng),
-                        message: new google.maps.InfoWindow({
-                            content: contentString,
-                            maxWidth: 320
-                        }),
-                        state: disasterreport.state,
-                        county: disasterreport.declaredCountyArea,
-                        title: disasterreport.title,
-                        disaster: disasterreport.incidentType,
-                        date_from: disasterreport.incidentBeginDate,
-                        date_to: disasterreport.incidentEndDate
-                    });
+                        // Converts each of the JSON records into Google Maps Location format (Note [Lat, Lng] format).
+                        locations.push({
+                            latlon: new google.maps.LatLng(lat, lng),
+                            message: new google.maps.InfoWindow({
+                                content: contentString,
+                                maxWidth: 320
+                            }),
+                            state: disasterreport.state,
+                            county: disasterreport.declaredCountyArea,
+                            title: disasterreport.title,
+                            disaster: disasterreport.incidentType,
+                            date_from: disasterreport.incidentBeginDate,
+                            date_to: disasterreport.incidentEndDate
+                        });
 
-                }).error(function(){
+                    })
+                .error(function(){
+                    console.log("Step 5");
                     console.error("API couldn't work well");
-                });
-                
-        }
-      }).error(function(){
-        console.error("Error generated");
-      });
-    console.log("iam hereeeee")
-    console.log(locations);
-    // location is now an array populated with records in Google Maps format
-    return locations;
+                });    
+            }
+            console.log("Step 4");
+            // console.log("iam hereeeee");
+            // console.log(locations);
+            // location is now an array populated with records in Google Maps format
+            console.log("function end");
+            return locations;
+
+        })
+        .error(function(){
+            console.log("Step 6");
+            console.error("Error generated");
+        });
     };
 
 // Initializes the map
