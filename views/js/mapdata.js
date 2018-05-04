@@ -79,6 +79,7 @@ angular.module('mapdata', []).factory('mapdata', function($http){
             var disasterSummary = results.DisasterDeclarationsSummaries;
             console.log("I am here somehow");
             for(var i= 0; i < disasterSummary.length; i++) {
+                console.log("Step for loop");
                 var disasterreport = disasterSummary[i];
                 // console.log(disasterreport);
                 var county;
@@ -93,111 +94,124 @@ angular.module('mapdata', []).factory('mapdata', function($http){
 
                 var lat,lng;
                     
-                //Get coordinates for each of the location
-                $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyCVonx72WOIIz2UW_L8Unp4P7E5Ob2bryk')
-                .success(function(latlng){
-                    console.log("Step 3");
-                    lat = latlng.results[0].geometry.location.lat;
-                    lng = latlng.results[0].geometry.location.lng;
+                LatLng = getCoords(address);
+                console.log("Lets see if I am getting the data");
+                console.log(LatLng.length);
+                LatLng.forEach(loc => console.log(loc));
+                lat = LatLng[0];
+                lng = LatLng[1];
+                console.log(lat+" "+lng);
+                  
+            
+                // Create popup windows for each record
+                var  contentString =
+                    '<p><b>State</b>: ' + disasterreport.state +
+                    '<br><b>County</b>: ' + disasterreport.declaredCountyArea +
+                    '<br><b>Title</b>: ' + disasterreport.title +
+                    '<br><b>Disaster</b>: ' + disasterreport.incidentType +
+                    '<br><b>Date From</b>: ' + disasterreport.incidentBeginDate +
+                    '<br><b>Date To</b>: ' + disasterreport.incidentEndDate +
+                    '</p>';
 
-                    // console.log("latlng"+lat+" "+lng);
-
-                    // Create popup windows for each record
-                    var  contentString =
-                        '<p><b>State</b>: ' + disasterreport.state +
-                        '<br><b>County</b>: ' + disasterreport.declaredCountyArea +
-                        '<br><b>Title</b>: ' + disasterreport.title +
-                        '<br><b>Disaster</b>: ' + disasterreport.incidentType +
-                        '<br><b>Date From</b>: ' + disasterreport.incidentBeginDate +
-                        '<br><b>Date To</b>: ' + disasterreport.incidentEndDate +
-                        '</p>';
-
-                        // Converts each of the JSON records into Google Maps Location format (Note [Lat, Lng] format).
-                        locations.push({
-                            latlon: new google.maps.LatLng(lat, lng),
-                            message: new google.maps.InfoWindow({
-                                content: contentString,
-                                maxWidth: 320
-                            }),
-                            state: disasterreport.state,
-                            county: disasterreport.declaredCountyArea,
-                            title: disasterreport.title,
-                            disaster: disasterreport.incidentType,
-                            date_from: disasterreport.incidentBeginDate,
-                            date_to: disasterreport.incidentEndDate
-                        });
-
-                    })
-                .error(function(){
-                    console.log("Step 5");
-                    console.error("API couldn't work well");
-                });    
+                // Converts each of the JSON records into Google Maps Location format (Note [Lat, Lng] format).
+                locations.push({
+                    latlon: new google.maps.LatLng(lat, lng),
+                    message: new google.maps.InfoWindow({
+                        content: contentString,
+                        maxWidth: 320
+                    }),
+                    state: disasterreport.state,
+                    county: disasterreport.declaredCountyArea,
+                    title: disasterreport.title,
+                    disaster: disasterreport.incidentType,
+                    date_from: disasterreport.incidentBeginDate,
+                    date_to: disasterreport.incidentEndDate
+                });
             }
-            console.log("Step 4");
-            // console.log("iam hereeeee");
-            // console.log(locations);
-            // location is now an array populated with records in Google Maps format
-            console.log("function end");
-            return locations;
-
         })
         .error(function(){
             console.log("Step 6");
             console.error("Error generated");
         });
+        console.log("Step 4");
+        console.log("iam hereeeee");
+        console.log(locations);
+        // location is now an array populated with records in Google Maps format
+        console.log("function end");
+        return locations;
     };
 
-// Initializes the map
-var initialize = function(latitude, longitude) {
-
-    // Uses the selected lat, long as starting point
-    var myLatLng = {lat: selectedLat, lng: selectedLng};
-
-    // If map has not been created already...
-    if (!map){
-
-        // Create a new map and place in the index.html page
-        var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 4,
-            center: myLatLng
-        });
+    var getCoords = function(address) {
+        var LatLng = [];
+        var googleLatlang;
+        $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyCVonx72WOIIz2UW_L8Unp4P7E5Ob2bryk')
+        .success(function(latlng){
+            console.log("Step 3");
+            // googleLatlang = new google.maps.LatLng(latlng.results[0].geometry.location.lat, latlng.results[0].geometry.location.lng)
+            LatLng[0] = latlng.results[0].geometry.location.lat;
+            LatLng[1] = latlng.results[0].geometry.location.lng;
+        })
+        .error(function(){
+            console.log("Step 5");
+            console.error("API couldn't work well");
+        });  
+        console.log("Data is sent from my side");
+        
+       // console.log(googleLatlang);
+        return LatLng;
     }
 
-    // Loop through each location in the array and place a marker
-    locations.forEach(function(n, i){
+    // Initializes the map
+    var initialize = function(latitude, longitude) {
+
+        // Uses the selected lat, long as starting point
+        var myLatLng = {lat: selectedLat, lng: selectedLng};
+
+        // If map has not been created already...
+        if (!map){
+
+            // Create a new map and place in the index.html page
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 4,
+                center: myLatLng
+            });
+        }
+
+        // Loop through each location in the array and place a marker
+        locations.forEach(function(n, i){
+            var marker = new google.maps.Marker({
+                position: n.latlon,
+                map: map,
+                title: "Big Map",
+                icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+            });
+
+            // For each marker created, add a listener that checks for clicks
+            google.maps.event.addListener(marker, 'click', function(e){
+
+                // When clicked, open the selected marker's message
+                currentSelectedMarker = n;
+                n.message.open(map, marker);
+            });
+        });
+
+        // Set initial location as a bouncing red marker
+        var initialLocation = new google.maps.LatLng(latitude, longitude);
         var marker = new google.maps.Marker({
-            position: n.latlon,
+            position: initialLocation,
+            animation: google.maps.Animation.BOUNCE,
             map: map,
-            title: "Big Map",
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
         });
+        lastMarker = marker;
 
-        // For each marker created, add a listener that checks for clicks
-        google.maps.event.addListener(marker, 'click', function(e){
+    };
 
-            // When clicked, open the selected marker's message
-            currentSelectedMarker = n;
-            n.message.open(map, marker);
-        });
-    });
+    // Refresh the page upon window load. Use the initial latitude and longitude
+    google.maps.event.addDomListener(window, 'load',
+        googleMapService.refresh(selectedLat, selectedLng));
 
-    // Set initial location as a bouncing red marker
-    var initialLocation = new google.maps.LatLng(latitude, longitude);
-    var marker = new google.maps.Marker({
-        position: initialLocation,
-        animation: google.maps.Animation.BOUNCE,
-        map: map,
-        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-    });
-    lastMarker = marker;
-
-};
-
-// Refresh the page upon window load. Use the initial latitude and longitude
-google.maps.event.addDomListener(window, 'load',
-    googleMapService.refresh(selectedLat, selectedLng));
-
-return googleMapService;
+    return googleMapService;
 });
 
  // exports.initMap = function(){
