@@ -18,12 +18,6 @@ angular.module('mapdata', []).factory('mapdata', function($http){
       selectedLat = latitude
       selectedLng = longitude;
 
-      $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries').success(function(response){
-        console.log("I am here somehow");
-      }).error(function(){
-        console.error("Error generated");
-      });
-
       //perform an AJAX call to get all records
       $http.get('/history').success(function(response){
         var latest_query = response[response.length -1];
@@ -80,38 +74,64 @@ angular.module('mapdata', []).factory('mapdata', function($http){
 
       $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?$filter='+query)
       .success(function(results){
-        console.log(results);
+        var disasterSummary = results.DisasterDeclarationsSummaries;
         console.log("I am here somehow");
-        for(var i= 0; i < results.length; i++) {
-                var disasterreport = response[i];
+        for(var i= 0; i < disasterSummary.length; i++) {
+                var disasterreport = disasterSummary[i];
+                console.log(disasterreport);
+                var county;
+                if(disasterreport.declaredCountyArea){
+                    county = disasterreport.declaredCountyArea.split(' (County)');
+                    console.log(county[0]);
+                }
+                if(county)
+                    address = county[0];
+                else
+                    address = disasterreport.state;
 
-                // Create popup windows for each record
-                var  contentString =
-                    '<p><b>State</b>: ' + user.state +
-                    '<br><b>Disaster</b>: ' + user.disaster_type +
-                    '<br><b>Date From</b>: ' + user.date_from +
-                    '<br><b>Date To</b>: ' + user.date_to +
-                    '</p>';
+                var lat,lng;
+                $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyCVonx72WOIIz2UW_L8Unp4P7E5Ob2bryk').success(function(latlng){
+                    lat = latlng.results[0].geometry.location.lat;
+                    lng = latlng.results[0].geometry.location.lng;
 
-                // Converts each of the JSON records into Google Maps Location format (Note [Lat, Lng] format).
-                locations.push({
-                    latlon: new google.maps.LatLng(user.location[1], user.location[0]),
-                    message: new google.maps.InfoWindow({
-                        content: contentString,
-                        maxWidth: 320
-                    }),
-                    state: user.state,
-                    disaster: user.disaster_type,
-                    date_from: user.date_from,
-                    date_to: user.date_to
-            });
+                    console.log("latlng"+lat+" "+lng);
+                    // Create popup windows for each record
+                    var  contentString =
+                        '<p><b>State</b>: ' + disasterreport.state +
+                        '<br><b>County</b>: ' + disasterreport.declaredCountyArea +
+                        '<br><b>Title</b>: ' + disasterreport.title +
+                        '<br><b>Disaster</b>: ' + disasterreport.incidentType +
+                        '<br><b>Date From</b>: ' + disasterreport.incidentBeginDate +
+                        '<br><b>Date To</b>: ' + disasterreport.incidentEndDate +
+                        '</p>';
+
+                    // Converts each of the JSON records into Google Maps Location format (Note [Lat, Lng] format).
+                    locations.push({
+                        latlon: new google.maps.LatLng(lat, lng),
+                        message: new google.maps.InfoWindow({
+                            content: contentString,
+                            maxWidth: 320
+                        }),
+                        state: disasterreport.state,
+                        county: disasterreport.declaredCountyArea,
+                        title: disasterreport.title,
+                        disaster: disasterreport.incidentType,
+                        date_from: disasterreport.incidentBeginDate,
+                        date_to: disasterreport.incidentEndDate
+                    });
+
+                }).error(function(){
+                    console.error("API couldn't work well");
+                });
+                
         }
       }).error(function(){
         console.error("Error generated");
       });
-      
-        // location is now an array populated with records in Google Maps format
-        return locations;
+    console.log("iam hereeeee")
+    console.log(locations);
+    // location is now an array populated with records in Google Maps format
+    return locations;
     };
 
 // Initializes the map
