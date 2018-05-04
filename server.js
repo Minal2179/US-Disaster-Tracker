@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override')
-var MapData = require('./views/js/mapdata.js')
+//var MapData = require('./views/js/mapdata.js')
 var port = process.env.PORT || 3000
 
 
@@ -38,7 +38,7 @@ app.listen(port, function(){
   console.log("Server starting on 3000!");
 });
 
-app.get("/", (req, res) => {
+/*app.get("/", (req, res) => {
  	db.collection('fema-dataset').find().toArray(function(err, results){
  		if (err) return console.log(err)
 	    // renders index.ejs
@@ -52,4 +52,4 @@ app.get("/", (req, res) => {
 
 	    res.render('index.ejs', {fema_dataset: mod_results})
  	});
-});
+});*/

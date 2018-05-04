@@ -1,7 +1,5 @@
-//Creating a google map service factory
+angular.module('mapdata', []).factory('mapdata', function($http){
 
-angular.module('mapdata', [])
-    .factory('mapdata', function($http){
     //Initialize variables
     var googleMapService = {};
 
@@ -20,21 +18,72 @@ angular.module('mapdata', [])
       selectedLat = latitude
       selectedLng = longitude;
 
+      $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries').success(function(response){
+        console.log("I am here somehow");
+      }).error(function(){
+        console.error("Error generated");
+      });
+
       //perform an AJAX call to get all records
       $http.get('/history').success(function(response){
+        var latest_query = response[response.length -1];
+        locations = convertToMapPoints(latest_query);
 
-          locations = convertToMapPoints(response);
+        initialize(latitude, longitude);
 
-          Initialize(latitude, longitude);
       }).error(function(){});
 
     };
 
     var convertToMapPoints = function(response){
       var locations = [];
+      console.log(response);
+      var statefilter = null;
+      var disasterfilter = null;
+      var incidentBeginDatefilter = null;
+      var incidentEndDatefilter = null;
+      var query='';
+      if(response.state){
+        statefilter = "state eq '"+response.state+"'";
+      }
+      if(response.disaster_type){
+        if(statefilter)
+            disasterfilter = "and incidentType eq '"+response.disaster_type+"'";
+        else
+            disasterfilter = "incidentType eq '"+response.disaster_type+"'";
+      }
+      if(response.date_from){
+        if(statefilter || disasterfilter)
+            incidentBeginDatefilter = "and incidentBeginDate ge '"+response.date_from+"'";
+        else
+            incidentBeginDatefilter = "incidentBeginDate ge '"+response.date_from+"'";
+      }
+      if(response.date_to){
+        if(statefilter || disasterfilter || incidentBeginDatefilter)
+            incidentEndDatefilter = "and incidentEndDate le '"+response.date_to+"'";
+        else
+            incidentEndDatefilter = "incidentEndDate le '"+response.date_to+"'";
+      }
+      if(statefilter!=null){
+        query = query+statefilter;
+      }
+      if(disasterfilter!=null){
+        query = query+disasterfilter;
+      }
+      if(incidentEndDatefilter!=null){
+        query = query+incidentEndDatefilter;
+      }
+      if(incidentBeginDatefilter!=null){
+        query = query+incidentBeginDatefilter;
+      }
 
-      for(var i= 0; i < response.length; i++) {
-                var user = response[i];
+
+      $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?$filter='+query)
+      .success(function(results){
+        console.log(results);
+        console.log("I am here somehow");
+        for(var i= 0; i < results.length; i++) {
+                var disasterreport = response[i];
 
                 // Create popup windows for each record
                 var  contentString =
@@ -57,6 +106,10 @@ angular.module('mapdata', [])
                     date_to: user.date_to
             });
         }
+      }).error(function(){
+        console.error("Error generated");
+      });
+      
         // location is now an array populated with records in Google Maps format
         return locations;
     };
@@ -65,14 +118,14 @@ angular.module('mapdata', [])
 var initialize = function(latitude, longitude) {
 
     // Uses the selected lat, long as starting point
-    var myLatLng = {lat: selectedLat, lng: selectedLong};
+    var myLatLng = {lat: selectedLat, lng: selectedLng};
 
     // If map has not been created already...
     if (!map){
 
         // Create a new map and place in the index.html page
         var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 3,
+            zoom: 4,
             center: myLatLng
         });
     }
@@ -109,10 +162,11 @@ var initialize = function(latitude, longitude) {
 
 // Refresh the page upon window load. Use the initial latitude and longitude
 google.maps.event.addDomListener(window, 'load',
-    googleMapService.refresh(selectedLat, selectedLong));
+    googleMapService.refresh(selectedLat, selectedLng));
 
 return googleMapService;
 });
+
  // exports.initMap = function(){
  //    //Map options added
  //    var options ={

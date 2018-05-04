@@ -31,15 +31,18 @@
 <div class="container">
     <div class="header">
         <ul class="nav nav-pills pull-right">
-            <li active><a href="">Heat Map</a></li>
-            <li disabled><a href="">Tabular Data</a></li>
+            <li id="heatmap" class="active"><a href="">Heat Map</a></li>
+            <li id="tabular" class=""><a href="">Tabular Data</a></li>
         </ul>
         <h3 class="text-muted">US Disaster Tracker</h3>
     </div>
     <!-- Map and Side Panel -->
     <div class="row content">
         <!-- Google Map -->
-        <div class="col-md-7">
+        <div class="col-md-7" id="visualization">
+            <div id="map" style="width:645px; height:645px"></div>
+        </div>
+        <div class="col-md-7 hidden" id="tablerep">
             <div id="map" style="width:645px; height:645px"></div>
         </div>
         <!-- Side Panel -->
@@ -56,18 +59,36 @@
                         <!-- Text Boxes and Other User Inputs. Note ng-model binds the values to Angular $scope -->
                         <div class="form-group">
                             <label class="control-label">Disaster Type</label>
-                            <div class="dropdown">
+                            <select ng-model="formData.disaster_type">
+                              <option value="flood">Flood</option>
+                              <option value="tornado">Tornado</option>
+                              <option value="chemical">Chemical</option>
+                              <option value="coastal storm">Coastal Storm</option>
+                              <option value="dam break">Dam/Levee break</option>
+                              <option value="drought">Drought</option>
+                              <option value="earthquake">Earthquake</option>
+                              <option value="fire">Fire</option>
+                              <option value="fishing losses">Fishing losses</option>
+                              <option value="freezing">Freezing</option>
+                              <option value="human cause">Human Cause</option>
+                              <option value="hurricane">Hurricane</option>
+                              <option value="landslide">Landslide</option>
+                              <option value="other">Other</option>
+                              <option value="severe storm">severe storm</option>
+                              <option value="snow">snow</option>
+                            </select>
+                            <!--<div class="dropdown">
                               <button class="dropbtn">Type</button>
                               <div class="dropdown-content">
                                 <a class="dropdown-item" ng-model="formData.disaster_type" href="#">Flood</a>
                                 <a class="dropdown-item" ng-model="formData.disaster_type" href="#">Tornado</a>
                                 <a class="dropdown-item" ng-model="formData.disaster_type" href="#">Storm</a>
                               </div>
-                            </div>
+                            </div>-->
                         </div>
                         <div class="form-group">
                             <label for="state">State</label>
-                            <input type="text" class="form-control" id="state" placeholder="US States" ng-model="formData.state">
+                            <input type="text" class="form-control" autocomplete="address-level1" id="state" placeholder="US States" ng-model="formData.state">
                         </div>
                         <div class="form-group">
                             <label for="state">Date from</label>
@@ -99,5 +120,22 @@
             <a href="https://linkedin.com/in/minalshettigar">LinkedIn</a> | <a href="https://github.com/Minal2179/US-Disaster-Tracker">Github Repo</a></p>
     </div>
 </div>
+<script type="text/javascript">
+    $('.nav li').on("click", function(){
+        $('.nav li').removeClass('active');
+        $(this).addClass('active');
+        if($(this).attr('id') == "tabular"){
+            console.log($(this).attr('id'));
+            console.log("I am here");
+            $('#visualization').addClass('hidden');
+            $('#tablerep').removeClass('hidden');
+        }
+        if($(this).attr('id') == "heatmap"){
+            $('#tablerep').addClass('hidden');
+            $('#visualization').removeClass('hidden');
+        }
+        console.log($(this).attr('id'));
+    })
+</script>
 </body>
 </html>

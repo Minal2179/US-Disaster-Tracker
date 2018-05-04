@@ -4,8 +4,8 @@ var Schema = mongoose.Schema;
 var HistorySchema = new Schema({
 	state: {type: String, required: false},
 	disaster_type: {type: String, required: false},
-	date_from: {type:Date, default: Date.now},
-	date_to: {type:Date, default: Date.now},
+	date_from: {type:Date},
+	date_to: {type:Date},
 	location: {type: [Number], required: true}, //[Long, Lat]
 	created_at: {type: Date, default: Date.now}
 });
