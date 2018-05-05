@@ -60,30 +60,8 @@
                         <div class="form-group">
                             <label class="control-label">Disaster Type</label>
                             <select ng-model="formData.disaster_type">
-                              <option value="Flood">Flood</option>
-                              <option value="Tornado">Tornado</option>
-                              <option value="Chemical">Chemical</option>
-                              <option value="Coastal storm">Coastal Storm</option>
-                              <option value="Dam/Levee break">Dam/Levee break</option>
-                              <option value="Drought">Drought</option>
-                              <option value="Earthquake">Earthquake</option>
-                              <option value="Fire">Fire</option>
-                              <option value="Fishing losses">Fishing losses</option>
-                              <option value="Freezing">Freezing</option>
-                              <option value="Human cause">Human Cause</option>
-                              <option value="Hurricane">Hurricane</option>
-                              <option value="Other">Other</option>
-                              <option value="Severe Storm(s)">Severe Storm(s)</option>
-                              <option value="Snow">Snow</option>
+                              <option ng-repeat="disaster in disasters" value="{{disaster.value}}">{{disaster.name}}</option>
                             </select>
-                            <!--<div class="dropdown">
-                              <button class="dropbtn">Type</button>
-                              <div class="dropdown-content">
-                                <a class="dropdown-item" ng-model="formData.disaster_type" href="#">Flood</a>
-                                <a class="dropdown-item" ng-model="formData.disaster_type" href="#">Tornado</a>
-                                <a class="dropdown-item" ng-model="formData.disaster_type" href="#">Storm</a>
-                              </div>
-                            </div>-->
                         </div>
                         <div class="form-group">
                             <label for="state">State</label>
@@ -96,14 +74,6 @@
                         <div class="form-group">
                             <label for="state">Date to</label>
                             <input type="date" class="form-control" id="date_from" placeholder="To date" ng-model="formData.date_to">
-                        </div>
-                        <div class="form-group">
-                            <label for="latitude">Latitude</label>
-                            <input type="text" class="form-control" id="latitude" value="39.500" ng-model="formData.latitude" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="longitude">Longitude</label>
-                            <input type="text" class="form-control" id="longitude" value="-98.350" ng-model="formData.longitude" readonly>
                         </div>
                         <!-- Submit button. Note that its tied to createUser() function from addCtrl. Also note ng-disabled logic which prevents early submits.  -->
                         <button type="submit" class="btn btn-danger btn-block" ng-click="createQuery()" ng-disabled="addForm.$invalid">Submit</button>

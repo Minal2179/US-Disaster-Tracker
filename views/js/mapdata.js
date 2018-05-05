@@ -1,4 +1,4 @@
-angular.module('mapdata', []).factory('mapdata', function($http){
+angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
 
     //Initialize variables
     var googleMapService = {};
@@ -83,8 +83,10 @@ angular.module('mapdata', []).factory('mapdata', function($http){
         //get Filtered FEMA data via api
         $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?$filter='+query)
         .success(function(results) {
+            $rootScope.disasterReport = results.DisasterDeclarationsSummaries;
             console.log("Step 2");
             var disasterSummary = results.DisasterDeclarationsSummaries;
+            console.log(disasterSummary);
 
             //Loop over each of the disasters to pinpoint on map
             for (var i = 0; i < disasterSummary.length; i++) {
@@ -93,14 +95,14 @@ angular.module('mapdata', []).factory('mapdata', function($http){
                     county = disasterSummary[i].declaredCountyArea.split(' (County)');
                 }
                 if(county)
-                    address = county[0];
+                    address = county[0]+","+disasterSummary[i].state;
                 else
                     address = disasterSummary[i].state;
                 //Calling function to get coordinates
                 var lat, lng;
                 getCoords(disasterSummary[i], address, function(report, eachloc){
-                    console.log(eachloc[0]+" "+eachloc[1]);
-                    console.log(report);
+                    // console.log(eachloc[0]+" "+eachloc[1]);
+                    // console.log(report);
                     lat = eachloc[0];
                     lng = eachloc[1];
                     
@@ -152,11 +154,13 @@ angular.module('mapdata', []).factory('mapdata', function($http){
     var getCoords = function(report, address, coordcallback) {
         var LatLng = [];
         var googleLatlang;
+        // console.log(address);
         $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyCVonx72WOIIz2UW_L8Unp4P7E5Ob2bryk')
         .success(function(latlng){
             console.log("Step 3");
             // googleLatlang = new google.maps.LatLng(latlng.results[0].geometry.location.lat, latlng.results[0].geometry.location.lng)
             var LatLng = [];
+            console.log(latlng);
             LatLng[0] = latlng.results[0].geometry.location.lat;
             LatLng[1] = latlng.results[0].geometry.location.lng;
             coordcallback(report, LatLng);
@@ -167,6 +171,30 @@ angular.module('mapdata', []).factory('mapdata', function($http){
         });  
     }
 
+    var icon=[
+        {disaster: 'Chemical', icon: '/../icon/chemical.png'},
+        {disaster: 'Coastal Storm', icon: '../icon/storm.png'},
+        {disaster: 'Dam/Levee Break', icon: '../icon/dam.png'},
+        {disaster: 'Drought', icon: '../icon/drought.png'},
+        {disaster: 'Earthquake', icon: '/../icon/earthquake.png'},
+        {disaster: 'Fire', icon: '../icon/fire.png'},
+        {disaster: 'Fishing Losses', icon: '../icon/fish.png'},
+        {disaster: 'Flood', icon: '../icon/flood.png'},
+        {disaster:'Freezing', icon:'../icon/freezer.png'},
+        {disaster:'Human Cause', icon:'../icon/human.png'},
+        {disaster:'Hurricane', icon:'../icon/tornado.png'},
+        {disaster:'Other', icon:'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'},
+        {disaster:'Mud/Landslide', icon:'../icon/landslide.png'},
+        {disaster:'Severe Ice Storm', icon:'../icon/storm.png'},
+        {disaster:'Severe Storm(s)', icon:'../icon/storm.png'},
+        {disaster:'Snow', icon:'../icon/snow.png'},
+        {disaster:'Terrorist', icon:'../icon/terrorist.png'},
+        {disaster:'Tornado', icon:'../icon/tornado.png'},
+        {disaster:'Toxic Substances', icon:'../icon/toxic.png'},
+        {disaster:'Tsunami', icon:'../icon/tsunami.png'},
+        {disaster:'Typhoon', icon:'../icon/tornado.png'},
+        {disaster:'Volcano', icon:'../icon/volcano.png'},
+    ]
     // Initializes the map
     var initialize = function(latitude, longitude, places, map) {
 
@@ -174,23 +202,22 @@ angular.module('mapdata', []).factory('mapdata', function($http){
         var myLatLng = {lat: selectedLat, lng: selectedLng};
 
         console.log(places);
-        // If map has not been created already...
-        // if (!map){
-        //     // Create a new map and place in the index.html page
-        //     var map = new google.maps.Map(document.getElementById('map'), {
-        //         zoom: 4,
-        //         center: myLatLng
-        //     });
-        // }
 
         // Loop through each location in the array and place a marker
         console.log("I am in initialize");
         console.log(places.latlon);
+        var disaster_icon;
+        for (var i = 0; i < icon.length; i++) {
+            if(icon[i].disaster == places.disaster){
+                console.log("They are equal");
+                disaster_icon = icon[i].icon;
+            }
+        }
         var marker = new google.maps.Marker({
             position: places.latlon,
             map: map,
-            title: "Big Map",
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+            title: places.county,
+            icon: (disaster_icon)?disaster_icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
         });
 
         // For each marker created, add a listener that checks for clicks
@@ -201,35 +228,6 @@ angular.module('mapdata', []).factory('mapdata', function($http){
             places.message.open(map, marker);
         });
 
-        // locations.forEach(function(n, i){
-        //     console.log("I am here");
-        //     console.log(n.latlon);
-        //     var marker = new google.maps.Marker({
-        //         position: n.latlon,
-        //         map: map,
-        //         title: "Big Map",
-        //         icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-        //     });
-
-        //     // For each marker created, add a listener that checks for clicks
-        //     google.maps.event.addListener(marker, 'click', function(e){
-
-        //         // When clicked, open the selected marker's message
-        //         currentSelectedMarker = n;
-        //         n.message.open(map, marker);
-        //     });
-        // });
-
-        // Set initial location as a bouncing red marker
-        // var initialLocation = new google.maps.LatLng(latitude, longitude);
-        // var marker = new google.maps.Marker({
-        //     position: initialLocation,
-        //     animation: google.maps.Animation.BOUNCE,
-        //     map: map,
-        //     icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-        // });
-        // lastMarker = marker;
-
     };
 
     // Refresh the page upon window load. Use the initial latitude and longitude
@@ -239,36 +237,3 @@ angular.module('mapdata', []).factory('mapdata', function($http){
     return googleMapService;
 });
 
- // exports.initMap = function(){
- //    //Map options added
- //    var options ={
- //      zoom:8,
- //      center:{lat:42.3601, lng:-71.0589}
- //    }
- //    //New map created
- //    var map = new google.maps.Map(document.getElementById('map'), options);
- //    //Markers added
- //    //function to add marker based on props
- //    function addMarker(props){
- //      var marker = new google.maps.Marker({
- //        position:props.coords,
- //        map:map
- //      });
-
- //      //check if props has icon
- //      if(props.icon){
- //        marker.setIcon(props.icon);
- //      }
-
- //      if(props.content){
- //        var infoWindow = new google.maps.InfoWindow({
- //          content: props.content
- //        });
-
- //        marker.addListener('click', function(){
- //          infoWindow.open(map, marker);
- //        });
- //      }
-
- //    }
- //  }

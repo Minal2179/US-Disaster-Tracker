@@ -38,18 +38,3 @@ app.listen(port, function(){
   console.log("Server starting on 3000!");
 });
 
-/*app.get("/", (req, res) => {
- 	db.collection('fema-dataset').find().toArray(function(err, results){
- 		if (err) return console.log(err)
-	    // renders index.ejs
-		var mod_results = [];
-		for (var i = 0; i < results.length; i++) {
-			if(results[i].incidentType == "Tornado" && results[i].state=="IN"){
-				MapData.initMap().addMarker({coords:{lat:40.2672, lng:-86.1349},icon:'https://www.flaticon.com/free-icon/tornado_189177#term=tornado&page=1&position=17', content:'<h1>Tornado data</h1>'})
-				mod_results.push(results[i]);
-			}
-		}
-
-	    res.render('index.ejs', {fema_dataset: mod_results})
- 	});
-});*/
