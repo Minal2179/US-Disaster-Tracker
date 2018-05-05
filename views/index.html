@@ -121,8 +121,6 @@
         $('.nav li').removeClass('active');
         $(this).addClass('active');
         if($(this).attr('id') == "tabular"){
-            console.log($(this).attr('id'));
-            console.log("I am here");
             $('#visualization').addClass('hidden');
             $('#tablerep').removeClass('hidden');
         }
@@ -130,11 +128,9 @@
             $('#tablerep').addClass('hidden');
             $('#visualization').removeClass('hidden');
         }
-        console.log($(this).attr('id'));
     });
     $('#disasterTable').DataTable({
         "ordering":true,
-        "scrollY": 400
     });
 
 </script>
