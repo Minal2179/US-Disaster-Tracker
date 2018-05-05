@@ -11,7 +11,7 @@ var port = process.env.PORT || 3000
 
 
 //Connection to MongoDB
-var mongoDB = 'mongodb://127.0.0.1/us-disaster-report';
+var mongoDB = 'mongodb://heroku_46p66m93:Harina2971@ds115340.mlab.com:15340/heroku_46p66m93';
 mongoose.connect(mongoDB);
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;

@@ -22,4 +22,4 @@ HistorySchema.pre('save', function(next){
 // HistorySchema.index({location: '2dsphere'});
 
 //Exports the HistorySchema to make available throughout the application
-module.exports = mongoose.model('query-history', HistorySchema);
+module.exports = mongoose.model('query_history', HistorySchema);

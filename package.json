@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "postinstall": "bower cache clean && bower install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,5 +24,9 @@
     "modernizr": "3.0.0",
     "mongoose": "^5.0.17",
     "morgan": "~1.2.2"
+  },
+  "engines": {
+    "node": "6.11.5",
+    "npm": "3.10.10"
   }
 }
