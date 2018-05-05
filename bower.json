@@ -1,0 +1,24 @@
+{
+  "name": "checkr",
+  "description": "",
+  "main": "server.js",
+  "authors": [
+    "Minal2179 <minalshettigar2971@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/Minal2179/US-Disaster-Tracker",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-route": "1.4.6",
+    "holderjs": "^2.9.4",
+    "modernizr": "3.0.0",
+    "bootstrap": "3.3.5",
+    "angularjs-geolocation": "0.1.1"
+  }
+}
