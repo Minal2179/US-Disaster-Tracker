@@ -38,8 +38,6 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
     //get Map points for each of the disaster instances
     var convertToMapPoints = function(response, callback){
         var locations = [];
-        console.log(response);
-        console.log("Step 1");
         var statefilter = null;
         var disasterfilter = null;
         var incidentBeginDatefilter = null;
@@ -83,9 +81,9 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
         $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?$filter='+query)
         .success(function(results) {
             $rootScope.disasterReport = results.DisasterDeclarationsSummaries;
-            console.log("Step 2");
+            
             var disasterSummary = results.DisasterDeclarationsSummaries;
-            console.log(disasterSummary);
+            
 
             //Loop over each of the disasters to pinpoint on map
             for (var i = 0; i < disasterSummary.length; i++) {
@@ -105,8 +103,7 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
                 //Calling function to get coordinates
                 var lat, lng;
                 getCoords(disasterSummary[i], address, function(report, eachloc){
-                    // console.log(eachloc[0]+" "+eachloc[1]);
-                    // console.log(report);
+                
                     lat = eachloc[0];
                     lng = eachloc[1];
                     
@@ -140,12 +137,10 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
 
                 });
             }
-
-            // callback(locations);
                 
         })
         .error(function(){
-            console.log("Step 6");
+            
             console.error("Error generated");
         })
         .finally(function(){
@@ -158,25 +153,21 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
     var getCoords = function(report, address, coordcallback) {
         var LatLng = [];
         var googleLatlang;
-        // console.log(address);
         $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyCVonx72WOIIz2UW_L8Unp4P7E5Ob2bryk')
         .success(function(latlng){
-            console.log("Step 3");
-            // googleLatlang = new google.maps.LatLng(latlng.results[0].geometry.location.lat, latlng.results[0].geometry.location.lng)
             var LatLng = [];
-            console.log(latlng);
+            
             LatLng[0] = latlng.results[0].geometry.location.lat;
             LatLng[1] = latlng.results[0].geometry.location.lng;
             coordcallback(report, LatLng);
         })
         .error(function(){
-            console.log("Step 5");
             console.error("API couldn't work well");
         });  
     }
 
     var icon=[
-        {disaster: 'Chemical', icon: '/../icon/chemical.png'},
+        {disaster: 'Chemical', icon: '../icon/chemistry.png'},
         {disaster: 'Coastal Storm', icon: '../icon/storm.png'},
         {disaster: 'Dam/Levee Break', icon: '../icon/dam.png'},
         {disaster: 'Drought', icon: '../icon/drought.png'},
@@ -205,15 +196,10 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
         // Uses the selected lat, long as starting point
         var myLatLng = {lat: selectedLat, lng: selectedLng};
 
-        console.log(places);
-
         // Loop through each location in the array and place a marker
-        console.log("I am in initialize");
-        console.log(places.latlon);
         var disaster_icon;
         for (var i = 0; i < icon.length; i++) {
             if(icon[i].disaster == places.disaster){
-                console.log("They are equal");
                 disaster_icon = icon[i].icon;
             }
         }
@@ -233,11 +219,6 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
         });
 
     };
-
-    // Refresh the page upon window load. Use the initial latitude and longitude
-    google.maps.event.addDomListener(window, 'load',
-        googleMapService.refresh(selectedLat, selectedLng));
-
     return googleMapService;
 });
 
