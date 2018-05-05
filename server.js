@@ -20,7 +20,6 @@ db.on('error', console.error.bind(console, "MongoDB Connection error:"));
 
 
 // Logging and Parsing
-// app.set('view engine', 'ejs');
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use(morgan('dev'));
 app.use(bodyParser.json());

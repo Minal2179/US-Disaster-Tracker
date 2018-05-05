@@ -35,8 +35,7 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
 
     };
 
-  
-
+    //get Map points for each of the disaster instances
     var convertToMapPoints = function(response, callback){
         var locations = [];
         console.log(response);
@@ -92,7 +91,12 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
             for (var i = 0; i < disasterSummary.length; i++) {
                 var county;
                 if(disasterSummary[i].declaredCountyArea){
-                    county = disasterSummary[i].declaredCountyArea.split(' (County)');
+                    if(disasterSummary[i].declaredCountyArea.indexOf('(District)') >=0)
+                        county = disasterSummary[i].declaredCountyArea.split(' (District)');
+                    if(disasterSummary[i].declaredCountyArea.indexOf('(County)') >=0)
+                        county = disasterSummary[i].declaredCountyArea.split(' (County)');
+                    if(disasterSummary[i].declaredCountyArea.indexOf('(Island)') >=0)
+                        county = disasterSummary[i].declaredCountyArea.split(' (Island)');
                 }
                 if(county)
                     address = county[0]+","+disasterSummary[i].state;
