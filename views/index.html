@@ -27,6 +27,7 @@
     <script src="js/addCtrl.js"></script>
     <!--DataTable-->
     <script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-datatables/2.1.0/angular-datatables.js"></script>
     
 </head>
 <body ng-controller="addCtrl">
@@ -83,7 +84,7 @@
         </div>
         <div class="col-md-7 hidden" id="tablerep">
             <div id="table" style="width:645px; height:645px">
-                <table id="disasterTable" data-page-length='10'>
+                <table id="disasterTable">
                     <thead>
                         <tr>
                             <th>State</th>
@@ -131,6 +132,8 @@
     });
     $('#disasterTable').DataTable({
         "ordering":true,
+        "bLengthChange":false,
+        "searching":false
     });
 
 </script>

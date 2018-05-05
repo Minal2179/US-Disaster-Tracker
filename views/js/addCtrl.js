@@ -1,6 +1,6 @@
 var addCtrl = angular.module('addCtrl', ['geolocation', 'mapdata']);
 
-addCtrl.controller('addCtrl', function($scope, $http, geolocation, mapdata,$rootScope){
+addCtrl.controller('addCtrl', function($scope, $http, geolocation, mapdata, $rootScope){
 
 	//Initialize variables
 	$scope.formData = {};
@@ -12,6 +12,7 @@ addCtrl.controller('addCtrl', function($scope, $http, geolocation, mapdata,$root
 
 	var latitude = 39.500;
 	var longitude = -98.350;
+
 
 	$scope.disasters=[
 			{name:'Flood', value:'Flood'},
