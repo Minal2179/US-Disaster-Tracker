@@ -84,22 +84,27 @@
         <div class="col-md-7 hidden" id="tablerep">
             <div id="table" style="width:645px; height:645px">
                 <table id="disasterTable" data-page-length='10'>
-                    <tr>
-                        <th>State</th>
-                        <th>County</th>
-                        <th>Disaster Type</th>
-                        <th>Title</th>
-                        <th>Disaster Begin Date</th>
-                        <th>Disaster End Date</th>
-                    </tr>
-                    <tr ng-repeat="report in disasterReport">
-                        <td>{{report.state}}</td>
-                        <td>{{report.declaredCountyArea}}</td>
-                        <td>{{report.incidentType}}</td>
-                        <td>{{report.title}}</td>
-                        <td>{{report.incidentBeginDate}}</td>
-                        <td>{{report.incidentEndDate}}</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>County</th>
+                            <th>Disaster Type</th>
+                            <th>Title</th>
+                            <th>Disaster Begin Date</th>
+                            <th>Disaster End Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="report in disasterReport">
+                            <td>{{report.state}}</td>
+                            <td>{{report.declaredCountyArea}}</td>
+                            <td>{{report.incidentType}}</td>
+                            <td>{{report.title}}</td>
+                            <td>{{report.incidentBeginDate}}</td>
+                            <td>{{report.incidentEndDate}}</td>
+                        </tr>
+                    </tbody>
+                    
                 </table>
             </div>
         </div>
@@ -127,10 +132,10 @@
         }
         console.log($(this).attr('id'));
     });
-    // $('#disasterTable').DataTable({
-    //     "ordering":true,
-    //     "scrollY": 400
-    // });
+    $('#disasterTable').DataTable({
+        "ordering":true,
+        "scrollY": 400
+    });
 
 </script>
 </body>

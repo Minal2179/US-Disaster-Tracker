@@ -81,10 +81,7 @@ angular.module('mapdata', []).factory('mapdata', function($http, $rootScope){
         $http.get('https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?$filter='+query)
         .success(function(results) {
             $rootScope.disasterReport = results.DisasterDeclarationsSummaries;
-            $('#disasterTable').DataTable({
-                "ordering":true,
-                "scrollY": 400
-            });
+            
             var disasterSummary = results.DisasterDeclarationsSummaries;
             
 
